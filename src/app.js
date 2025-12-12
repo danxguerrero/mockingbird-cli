@@ -1,10 +1,18 @@
-import React from 'react';
-import {Text} from 'ink';
+import React, { useState } from 'react';
+import { Box, Text } from 'ink';
+import { Interview} from './components/Interview.js'
 
-export default function App({name = 'Stranger'}) {
+const username = process.env['USER'] || process.env['LOGNAME'] || process.env['USERNAME'] || ''
+
+export default function App() {
+	const [interviewActive, setInterviewActive] = useState(false)
 	return (
-		<Text>
-			Hello, <Text color="green">{name}</Text>
-		</Text>
+		<Box flexDirection="column" borderStyle="round" borderColor="green">
+			<Text>
+				Hello, <Text color="green">{username}</Text>, Welcome to MockingBird!
+			</Text>
+			<Text>Press 's' to start an interview. Press 'q' to quit.</Text>
+			<Interview />
+		</Box>
 	);
 }
