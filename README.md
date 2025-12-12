@@ -5,12 +5,12 @@
 ## Install
 
 ```bash
-$ npm install --global mockingbird-cli
+npm install --global mockingbird-cli
 ```
 
 ## CLI
 
-```
+```bash
 $ mockingbird-cli --help
 
   Usage
