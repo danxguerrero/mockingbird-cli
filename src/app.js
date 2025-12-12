@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { Interview } from './interview/Interview.js';
 import { Timer } from './interview/components/timer.js';
@@ -8,6 +8,9 @@ const username = process.env['USER'] || process.env['LOGNAME'] || process.env['U
 export default function App() {
 	// This will be used to track whether an interview is active
 	const [interviewActive, setInterviewActive] = useState(false);
+	const handleTimerComplete = useCallback(() => {
+		setInterviewActive(false);
+	}, []);
 
 	useInput((input, key) => {
 		if (input === 's' && !interviewActive) {
@@ -24,7 +27,7 @@ export default function App() {
 					Hello, <Text color="green">{username}</Text>, Welcome to MockingBird!
 				</Text>
 				<Box>
-					<Timer isActive={interviewActive} onTimerComplete={() => setInterviewActive(false)} />
+					<Timer isActive={interviewActive} onTimerComplete={handleTimerComplete} />
 				</Box>
 			</Box>
 
