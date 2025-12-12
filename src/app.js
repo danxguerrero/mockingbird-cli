@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Box, Text } from 'ink';
-import { Interview} from './components/Interview.js'
+import { Interview } from './components/Interview.js'
 
 const username = process.env['USER'] || process.env['LOGNAME'] || process.env['USERNAME'] || ''
 
 export default function App() {
+
+	// This will be used to track whether an interview is active
 	const [interviewActive, setInterviewActive] = useState(false)
+
 	return (
 		<Box flexDirection="column" borderStyle="round" borderColor="green">
 			<Text>
