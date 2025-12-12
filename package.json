@@ -17,6 +17,7 @@
 	],
 	"dependencies": {
 		"ink": "^6.5.1",
+		"ink-text-input": "^6.0.0",
 		"meow": "^11.0.0",
 		"react": "^19.2.2",
 		"react-dom": "^19.2.2"
@@ -53,7 +54,12 @@
 	"prettier": "@vdemedes/prettier-config",
 	"babel": {
 		"presets": [
-			["@babel/preset-react", { "runtime": "automatic" }]
+			[
+				"@babel/preset-react",
+				{
+					"runtime": "automatic"
+				}
+			]
 		]
 	}
 }
