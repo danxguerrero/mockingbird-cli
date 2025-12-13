@@ -21,7 +21,7 @@ export const CodeInput = ({ onSubmit, focus = false }) => {
                 showCursor={focus}
                 focus={focus}
             />
-            <Text color="gray">Press Enter to submit, Ctrl+C to cancel</Text>
+            <Text color="gray">Press Ctrl+W to enter Navigation Mode</Text>
         </Box>
     );
 };
