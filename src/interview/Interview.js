@@ -68,7 +68,7 @@ export const Interview = () => {
     return (
         <Box flexDirection="column" height="100%">
             <Box flexDirection="row" flexGrow={1}>
-                <Box width="25%" borderStyle="round" borderColor="green">
+                <Box width="25%" borderStyle="round" borderColor="green" flexDirection="column">
                     <Text>Question here</Text>
                     {navigationMode && (
                         <Text color="yellow">
