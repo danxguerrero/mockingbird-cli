@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Text } from 'ink';
 import TextInput from 'ink-text-input';
 
-export const CodeInput = ({ onSubmit }) => {
+export const CodeInput = ({ onSubmit, focus = false }) => {
     const [code, setCode] = useState('');
 
     const handleSubmit = () => {
@@ -18,9 +18,10 @@ export const CodeInput = ({ onSubmit }) => {
                 onChange={setCode}
                 onSubmit={handleSubmit}
                 placeholder="Enter your code here..."
-                showCursor={true}
+                showCursor={focus}
+                focus={focus}
             />
-            <Text color="gray">Press Enter to submit, Ctrl+C to cancel</Text>
+            <Text color="gray">Press Ctrl+W to enter Navigation Mode</Text>
         </Box>
     );
 };
