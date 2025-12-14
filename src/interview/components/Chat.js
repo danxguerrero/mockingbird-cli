@@ -27,6 +27,11 @@ export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMo
             return;
         }
 
+        // Don't handle scroll keys in navigation mode to avoid conflicts
+        if (navigationMode) {
+            return;
+        }
+
         if (key.upArrow) {
             if (scrollOffset > 0) {
                 setScrollOffset(prev => Math.max(0, prev - 1));
