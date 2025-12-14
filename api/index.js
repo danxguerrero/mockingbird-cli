@@ -98,6 +98,64 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
+// Feedback endpoint
+app.post('/api/feedback', async (req, res) => {
+    try {
+        const { historyString } = req.body;
+
+        if (!GEMINI_API_KEY) {
+            return res.status(500).json({
+                error: 'API key not configured',
+                message: 'Gemini API key is missing from environment variables'
+            });
+        }
+
+        if (!model) {
+            return res.status(500).json({
+                error: 'AI service not initialized',
+                message: 'Gemini model failed to initialize'
+            });
+        }
+
+        const feedbackPrompt = `You are reviewing a mock technical interview that the user just had. Based on the provided chat History, write feedback on the users performance.
+
+        The feedback should focus on the following areas:
+        1. Communication - Does the candidate make clarifications, communicate their approach and explain while coding?
+        2. Problem Solving - Does the candidate show they understand the problem and are able to come up with a sound approach, conduct trade-offs analysis and optimize their approach?
+        3. Technical Competency - How fast and accurate is the implementation? Were there syntax errors?
+        4. Testing - Was the code tested for common and corner cases? Did they self-correct bugs?
+
+        Provide a score of 1-4 for every dimension and then sum them up into an overall score. The scoring bands should be:
+
+        Strong hire
+        Hire
+        No hire
+        Strong no hire
+
+        For higher scores, give feeback on what made them great and encourage them to continue doing this or tips for improving even more.
+        For lower scores, provide very brief examples of what needs improvement and how to help them improve. The overall focus is to help the user eventuall get a strong hire score.
+
+        Chat History:
+        ${historyString}`;
+
+        // Generate feedback using official SDK
+        const result = await model.generateContent(feedbackPrompt);
+        const feedback = result.response.text();
+
+        res.json({
+            feedback: feedback.trim(),
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('Feedback generation error:', error);
+        res.status(500).json({
+            error: 'Server error',
+            message: 'An unexpected error occurred while generating feedback'
+        });
+    }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);

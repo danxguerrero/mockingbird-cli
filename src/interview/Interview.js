@@ -7,7 +7,12 @@ import {questionData} from '../data/questions.js';
 
 const API_BASE_URL = process.env.MOCKINGBIRD_API_URL || 'http://localhost:3000';
 
-export const Interview = () => {
+// Export a forwardRef to allow parent to access internal methods
+export const Interview = React.forwardRef(({ onFeedback }, ref) => {
+	// Expose the generateFeedbackHistoryString method to parent components
+	React.useImperativeHandle(ref, () => ({
+		generateFeedbackHistoryString
+	}));
 	const [submittedCode, setSubmittedCode] = useState('');
 	const [currentCode, setCurrentCode] = useState('');
 	const [isLoadingAI, setIsLoadingAI] = useState(false);
@@ -21,6 +26,29 @@ export const Interview = () => {
 	const [navigationMode, setNavigationMode] = useState(false);
 	const [focusArea, setFocusArea] = useState('chat'); // 'code', 'chat', or 'scroll'
 	const [currentQuestion, setCurrentQuestion] = useState(null);
+
+	// Generate chat history string for feedback including the question
+	const generateFeedbackHistoryString = () => {
+		let historyString = '';
+
+		// Include the question at the beginning
+		if (currentQuestion) {
+			historyString += `Question: ${currentQuestion.description}\nDifficulty: ${currentQuestion.difficulty}\n\n`;
+		}
+
+		// Add all messages
+		messages.forEach(msg => {
+			const roleLabel = msg.role === 'user' ? 'Candidate' : 'Interviewer';
+			historyString += `${roleLabel}: ${msg.content}\n`;
+		});
+
+		// Include final submitted code if any
+		if (submittedCode || currentCode.trim()) {
+			historyString += `\nFinal submitted code:\n${submittedCode || currentCode.trim()}\n`;
+		}
+
+		return historyString;
+	};
 
 	// Load and set a random question when component mounts
 	useEffect(() => {
@@ -196,4 +224,4 @@ export const Interview = () => {
 		</Box>
 	</Box>
 	);
-};
+});
