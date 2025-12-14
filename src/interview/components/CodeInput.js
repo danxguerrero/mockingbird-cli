@@ -1,25 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Text } from 'ink';
-import TextInput from 'ink-text-input';
+import { CodeEditorInput } from './CodeEditorInput.js';
 
 export const CodeInput = ({ onSubmit, focus = false }) => {
-    const [code, setCode] = useState('');
-
-    const handleSubmit = () => {
-        if (code.trim() && onSubmit) {
-            onSubmit(code);
-        }
-    };
-
     return (
         <Box flexDirection="column">
-            <TextInput
-                value={code}
-                onChange={setCode}
-                onSubmit={handleSubmit}
-                placeholder="Enter your code here..."
-                showCursor={focus}
+            <CodeEditorInput
+                onSubmit={onSubmit}
                 focus={focus}
+                maxHeight={6}
             />
             <Text color="gray">Press Ctrl+W to enter Navigation Mode</Text>
         </Box>
