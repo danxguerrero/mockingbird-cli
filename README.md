@@ -8,6 +8,28 @@
 npm install --global mockingbird-cli
 ```
 
+## Configuration
+
+Before using the CLI, you must set the `MOCKINGBIRD_API_KEY` environment variable:
+
+```bash
+export MOCKINGBIRD_API_KEY=your_api_key_here
+```
+
+### Alternative: Use a .env file
+
+Create a `.env` file in your working directory:
+
+```
+MOCKINGBIRD_API_KEY=your_api_key_here
+```
+
+The CLI will load environment variables from this file automatically.
+
+### Getting an API Key
+
+API keys are provided by the MockingBird service administrators. Contact the development team for access.
+
 ## CLI
 
 ```bash

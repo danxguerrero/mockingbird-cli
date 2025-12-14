@@ -3,8 +3,16 @@ import {useState, useEffect} from 'react';
 import {CodeInput} from './components/CodeInput.js';
 import {Chat} from './components/Chat.js';
 
-// Embedded API key for CLI authentication (distributed with published package)
-const API_KEY = 'REMOVED_FOR_SECURITY';
+// API key configuration - must be provided via environment variable
+const API_KEY = process.env.MOCKINGBIRD_API_KEY;
+
+if (!API_KEY) {
+	throw new Error(
+		'MOCKINGBIRD_API_KEY environment variable is required.\n' +
+		'Please set it using: export MOCKINGBIRD_API_KEY=your_api_key_here\n' +
+		'Or add it to your .env file in your CLI project directory.'
+	);
+}
 
 const API_BASE_URL = 'https://mockingbird-cli.vercel.app';
 
