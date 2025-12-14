@@ -21,9 +21,9 @@ export const Interview = () => {
 
 	// Load and set a random question when component mounts
 	useEffect(() => {
-		if (questionData.questions && questionData.questions.length > 0) {
-			const randomIndex = Math.floor(Math.random() * questionData.questions.length);
-			setCurrentQuestion(questionData.questions[randomIndex]);
+		if (questionData && questionData.length > 0) {
+			const randomIndex = Math.floor(Math.random() * questionData.length);
+			setCurrentQuestion(questionData[randomIndex]);
 		}
 	}, []);
 
