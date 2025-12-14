@@ -8,8 +8,9 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
-    "express": "^4.21.1",
-    "@google/generative-ai": "0.24.1"
+    "@google/generative-ai": "0.24.1",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.0"

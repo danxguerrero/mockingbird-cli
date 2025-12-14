@@ -3,6 +3,11 @@ import {useState, useEffect} from 'react';
 import {CodeInput} from './components/CodeInput.js';
 import {Chat} from './components/Chat.js';
 
+// Embedded API key for CLI authentication (distributed with published package)
+const API_KEY = 'REMOVED_FOR_SECURITY';
+
+const API_BASE_URL = 'https://mockingbird-cli.vercel.app';
+
 export const Interview = () => {
 	const [submittedCode, setSubmittedCode] = useState('');
 	const [messages, setMessages] = useState([
@@ -15,22 +20,59 @@ export const Interview = () => {
 	const [navigationMode, setNavigationMode] = useState(false);
 	const [focusArea, setFocusArea] = useState('chat'); // 'code', 'chat', or 'scroll'
 	const [aiResponseCount, setAiResponseCount] = useState(0);
+	const [isLoading, setIsLoading] = useState(false);
 
-	// Handle delayed AI responses
+	// Function to call the API
+	async function callChatAPI(userMessages) {
+		try {
+			setIsLoading(true);
+
+			const response = await fetch(`${API_BASE_URL}/api/chat`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-api-key': API_KEY
+				},
+				body: JSON.stringify({
+					messages: userMessages,
+					context: {
+						submittedCode: submittedCode,
+						interviewTime: '15 minutes' // Could be calculated from timer
+					}
+				})
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+			}
+
+			const data = await response.json();
+			return data.response;
+		} catch (error) {
+			console.error('API call failed:', error);
+			return `Sorry, I encountered an error: ${error.message}. Please try again.`;
+		} finally {
+			setIsLoading(false);
+		}
+	}
+
+	// Handle AI responses
 	useEffect(() => {
 		if (aiResponseCount > 0) {
-			const timer = setTimeout(() => {
+			const fetchResponse = async () => {
+				const aiResponse = await callChatAPI(messages);
 				setMessages(prev => [
 					...prev,
 					{
 						role: 'assistant',
-						content:
-							'This is a placeholder response. AI integration coming soon!',
+						content: aiResponse,
 					},
 				]);
 				setAiResponseCount(prev => prev - 1);
-			}, 500);
-			return () => clearTimeout(timer);
+			};
+
+			fetchResponse();
 		}
 	}, [aiResponseCount]);
 

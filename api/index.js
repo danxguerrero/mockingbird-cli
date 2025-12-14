@@ -1,5 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import crypto from 'crypto';
 
 const app = express();
 
@@ -19,6 +21,63 @@ if (GEMINI_API_KEY) {
     } catch (error) {
         console.error('Failed to initialize Gemini:', error);
     }
+}
+
+// API Key Configuration (required via environment variable for security)
+const MOCKINGBIRD_API_KEY = process.env.MOCKINGBIRD_API_KEY;
+
+if (!MOCKINGBIRD_API_KEY) {
+    console.error('❌ MOCKINGBIRD_API_KEY environment variable is required');
+    process.exit(1);
+}
+
+// API Key Authentication Middleware
+function authenticateAPIKey(req, res, next) {
+    const apiKey = req.headers['x-api-key'] || req.headers['authorization']?.replace('Bearer ', '');
+
+    if (!apiKey) {
+        return res.status(401).json({
+            error: 'API key required',
+            message: 'Please provide an API key in the x-api-key header'
+        });
+    }
+
+    if (!crypto.timingSafeEqual(Buffer.from(apiKey), Buffer.from(MOCKINGBIRD_API_KEY))) {
+        return res.status(401).json({
+            error: 'Invalid API key',
+            message: 'The provided API key is not valid'
+        });
+    }
+
+    next();
+}
+
+// Rate limiting (simple in-memory implementation)
+const requestCounts = new Map();
+const WINDOW_MS = 60 * 1000; // 1 minute
+const MAX_REQUESTS = 30; // requests per minute per API key
+
+function rateLimit(req, res, next) {
+    const apiKey = req.headers['x-api-key'] || req.headers['authorization']?.replace('Bearer ', '');
+    if (!apiKey) return next();
+
+    const now = Date.now();
+    const key = `rate_${apiKey}_${Math.floor(now / WINDOW_MS)}`;
+
+    const currentCount = requestCounts.get(key) || 0;
+    if (currentCount >= MAX_REQUESTS) {
+        return res.status(429).json({
+            error: 'Rate limit exceeded',
+            message: 'Too many requests. Please try again later.',
+            retryAfter: WINDOW_MS - (now % WINDOW_MS)
+        });
+    }
+
+    requestCounts.set(key, currentCount + 1);
+    next();
+
+    // Clean up old entries (simple cleanup)
+    setTimeout(() => requestCounts.delete(key), WINDOW_MS * 2);
 }
 
 function formatMessagesForGemini(messages, context = {}) {
@@ -56,8 +115,8 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-// Chat endpoint
-app.post('/api/chat', async (req, res) => {
+// Chat endpoint (secured)
+app.post('/api/chat', authenticateAPIKey, rateLimit, async (req, res) => {
     try {
         const { messages = [], context = {} } = req.body;
 
