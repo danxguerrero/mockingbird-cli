@@ -1,15 +1,59 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Box, Text, useInput } from 'ink';
 import { Interview } from './interview/Interview.js';
 import { Timer } from './interview/components/timer.js';
+import { Feedback } from './interview/components/Feedback.js';
+
+const API_BASE_URL = process.env.MOCKINGBIRD_API_URL || 'http://localhost:3000';
 
 const username = process.env['USER'] || process.env['LOGNAME'] || process.env['USERNAME'] || '';
 
 export default function App() {
 	// This will be used to track whether an interview is active
 	const [interviewActive, setInterviewActive] = useState(false);
-	const handleTimerComplete = useCallback(() => {
+	const [feedback, setFeedback] = useState(null);
+	const [generatingFeedback, setGeneratingFeedback] = useState(false);
+	const interviewRef = useRef();
+
+	const handleTimerComplete = useCallback(async () => {
+		if (interviewRef.current) {
+			setGeneratingFeedback(true);
+
+			try {
+				// Get chat history from the Interview component
+				const historyString = interviewRef.current.generateFeedbackHistoryString();
+
+				// Call feedback API
+				const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						historyString: historyString
+					}),
+				});
+
+				if (!response.ok) {
+					throw new Error(`API request failed: ${response.status}`);
+				}
+
+				const data = await response.json();
+				setFeedback(data.feedback);
+			} catch (error) {
+				console.error('Feedback generation error:', error);
+				setFeedback('Sorry, I was unable to generate feedback. Please check your connection and try again.');
+			} finally {
+				setGeneratingFeedback(false);
+			}
+		}
+
+		// End the interview
 		setInterviewActive(false);
+	}, []);
+
+	const handleFeedbackClose = useCallback(() => {
+		setFeedback(null);
 	}, []);
 
 	useInput((input, key) => {
@@ -31,7 +75,17 @@ export default function App() {
 				</Box>
 			</Box>
 
-			{interviewActive ? <Interview /> : <Text>Press <Text color="green">'s'</Text> to start an interview. Press <Text color="green">'q'</Text> to quit.</Text>}
+			{interviewActive ? (
+				<Interview ref={interviewRef} />
+			) : feedback ? (
+				generatingFeedback ? (
+					<Text color="yellow">🎯 Generating feedback...</Text>
+				) : (
+					<Feedback feedback={feedback} onClose={handleFeedbackClose} />
+				)
+			) : (
+				<Text>Press <Text color="green">'s'</Text> to start an interview. Press <Text color="green">'q'</Text> to quit.</Text>
+			)}
 		</Box>
 	);
 }
