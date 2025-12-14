@@ -115,6 +115,8 @@ export default function App() {
 						<Text color="gray" marginTop={1}>Press <Text color="green">'q'</Text> to quit.</Text>
 					</Box>
 				)
+			) : feedback ? (
+				<Feedback feedback={feedback} onClose={startNewInterview} />
 			) : (
 				<Text>Press <Text color="green">'s'</Text> to start an interview. Press <Text color="green">'q'</Text> to quit.</Text>
 			)}
