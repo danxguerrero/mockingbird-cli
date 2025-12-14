@@ -105,9 +105,17 @@ export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
             if (leadingSpaces.length >= 4) {
                 newLines[cursorY] = ' '.repeat(leadingSpaces.length - 4) + currentLine.slice(leadingSpaces.length);
                 setLines(newLines);
+                const removed = 4;
+                if (cursorX <= leadingSpaces.length) {
+                    setCursorX(Math.max(0, cursorX - removed));
+                }
             } else if (leadingSpaces.length > 0) {
                 newLines[cursorY] = currentLine.slice(leadingSpaces.length);
                 setLines(newLines);
+                const removed = leadingSpaces.length;
+                if (cursorX <= leadingSpaces.length) {
+                    setCursorX(Math.max(0, cursorX - removed));
+                }
             }
             return;
         }
