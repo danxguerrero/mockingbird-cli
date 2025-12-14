@@ -6,24 +6,36 @@ import { ChatMessage } from './ChatMessage.js';
 export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMode = false }) => {
     const [scrollOffset, setScrollOffset] = useState(0);
     const [isScrolling, setIsScrolling] = useState(false);
-    const maxVisibleMessages = 8; // Number of messages visible at once
+    const maxVisibleMessages = 4; // Number of messages visible at once (adjusted for actual terminal space)
     const scrollTimeoutRef = useRef(null);
     const isChatFocused = focusArea === 'chat' && !navigationMode;
-    const isScrollFocused = focusArea === 'scroll' && !navigationMode;
+    const isScrollFocused = focusArea === 'scroll';
 
-    // Auto-scroll to bottom when new messages arrive (only if not manually scrolling)
+    // Auto-scroll to bottom when new messages arrive (only if not manually scrolling or actively scrolling)
     useEffect(() => {
-        if (messages.length > maxVisibleMessages && !isScrolling && !isScrollFocused) {
-            setScrollOffset(messages.length - maxVisibleMessages);
-        } else if (messages.length <= maxVisibleMessages) {
-            setScrollOffset(0);
-        }
+        // if (messages.length > maxVisibleMessages && !isScrolling && !isScrollFocused) {
+        //     setScrollOffset(messages.length - maxVisibleMessages);
+        // } else if (messages.length <= maxVisibleMessages) {
+        //     setScrollOffset(0);
+        // }
+        setScrollOffset(prev => {
+            const maxOffset = Math.max(0, messages.length - maxVisibleMessages);
+            if (messages.length <= maxVisibleMessages) return 0;
+            const clampedPrev = Math.min(Math.max(0, prev), maxOffset);
+            if (!isScrolling && !isScrollFocused) return maxOffset;
+            return clampedPrev;
+        });
     }, [messages.length, isScrolling, isScrollFocused]);
 
     // Handle keyboard scrolling when scroll area is focused
     useInput((input, key) => {
         // Only handle scroll keys when scroll area is focused
         if (!isScrollFocused) {
+            return;
+        }
+
+        // Don't handle scroll keys in navigation mode to avoid conflicts
+        if (navigationMode) {
             return;
         }
 
@@ -116,7 +128,7 @@ export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMo
                     <>
                         {visibleMessages.map((msg, index) => (
                             <ChatMessage
-                                key={`${scrollOffset + index}-${msg.content.substring(0, 10)}`}
+                                key={`${scrollOffset}-${index}-${msg.role}`}
                                 message={msg}
                                 role={msg.role}
                             />
