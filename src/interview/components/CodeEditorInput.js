@@ -161,7 +161,7 @@ export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
         }
 
         // Backspace
-        if (key.backspace || key.delete) {
+        if (key.backspace) {
             const currentLine = lines[cursorY];
             if (cursorX > 0) {
                 // Delete character before cursor
