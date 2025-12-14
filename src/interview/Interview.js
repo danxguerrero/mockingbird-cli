@@ -3,19 +3,6 @@ import {useState, useEffect} from 'react';
 import {CodeInput} from './components/CodeInput.js';
 import {Chat} from './components/Chat.js';
 
-// API key configuration - must be provided via environment variable
-const API_KEY = process.env.MOCKINGBIRD_API_KEY;
-
-if (!API_KEY) {
-	throw new Error(
-		'MOCKINGBIRD_API_KEY environment variable is required.\n' +
-		'Please set it using: export MOCKINGBIRD_API_KEY=your_api_key_here\n' +
-		'Or add it to your .env file in your CLI project directory.'
-	);
-}
-
-const API_BASE_URL = 'https://mockingbird-cli.vercel.app';
-
 export const Interview = () => {
 	const [submittedCode, setSubmittedCode] = useState('');
 	const [messages, setMessages] = useState([
@@ -35,24 +22,42 @@ export const Interview = () => {
 		try {
 			setIsLoading(true);
 
-			const response = await fetch(`${API_BASE_URL}/api/chat`, {
+			// Read environment variables at runtime
+			const apiKey = process.env.MOCKINGBIRD_API_KEY;
+			const apiBaseUrl =
+				process.env.MOCKINGBIRD_API_BASE_URL ||
+				'https://mockingbird-cli.vercel.app';
+
+			// Validate API key at runtime (first API call)
+			if (!apiKey) {
+				throw new Error(
+					'MOCKINGBIRD_API_KEY environment variable is required.\n' +
+						'Please set it using: export MOCKINGBIRD_API_KEY=your_api_key_here\n' +
+						'Or add it to your .env file in your CLI project directory.',
+				);
+			}
+
+			const response = await fetch(`${apiBaseUrl}/api/chat`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'x-api-key': API_KEY
+					'x-api-key': apiKey,
 				},
 				body: JSON.stringify({
 					messages: userMessages,
 					context: {
 						submittedCode: submittedCode,
-						interviewTime: '15 minutes' // Could be calculated from timer
-					}
-				})
+						interviewTime: '15 minutes', // Could be calculated from timer
+					},
+				}),
 			});
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+				throw new Error(
+					errorData.message ||
+						`HTTP ${response.status}: ${response.statusText}`,
+				);
 			}
 
 			const data = await response.json();

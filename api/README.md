@@ -5,11 +5,13 @@ Serverless API service for MockingBird CLI that provides Gemini AI-powered inter
 ## Setup
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Environment variables:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your Gemini API key
@@ -24,36 +26,41 @@ Serverless API service for MockingBird CLI that provides Gemini AI-powered inter
 ## Endpoints
 
 ### POST `/api/chat`
+
 Generates AI responses for coding interviews.
 
 **Request body:**
+
 ```json
 {
-  "messages": [
-    {"role": "user", "content": "Hello, let's start the interview"},
-    {"role": "assistant", "content": "Welcome! Let's begin..."}
-  ],
-  "context": {
-    "submittedCode": "// user's code here",
-    "interviewTime": "5 minutes"
-  }
+	"messages": [
+		{"role": "user", "content": "Hello, let's start the interview"},
+		{"role": "assistant", "content": "Welcome! Let's begin..."}
+	],
+	"context": {
+		"submittedCode": "// user's code here",
+		"interviewTime": "5 minutes"
+	}
 }
 ```
 
 **Response:**
+
 ```json
 {
-  "response": "AI-generated interview response...",
-  "timestamp": "2025-12-13T20:42:00.000Z"
+	"response": "AI-generated interview response...",
+	"timestamp": "2025-12-13T20:42:00.000Z"
 }
 ```
 
 ### GET `/api/health`
+
 Health check endpoint.
 
 ## Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 npm i -g vercel
 vercel --prod

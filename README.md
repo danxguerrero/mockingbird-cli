@@ -10,21 +10,33 @@ npm install --global mockingbird-cli
 
 ## Configuration
 
-Before using the CLI, you must set the `MOCKINGBIRD_API_KEY` environment variable:
+The CLI supports environment variable configuration for API access. API key validation happens at runtime during the first API call, allowing CLI help and other commands to work without requiring an API key.
+
+### Environment Variables
+
+- `MOCKINGBIRD_API_KEY` (required): Your API key for the MockingBird service
+- `MOCKINGBIRD_API_BASE_URL` (optional): Base URL for the API (defaults to `https://mockingbird-cli.vercel.app`)
+
+### Setting Environment Variables
+
+You can set the API key in several ways:
+
+#### Option 1: Export in your shell
 
 ```bash
 export MOCKINGBIRD_API_KEY=your_api_key_here
 ```
 
-### Alternative: Use a .env file
+#### Option 2: Use a .env file
 
-Create a `.env` file in your working directory:
+Create a `.env` file in your CLI project directory:
 
 ```
 MOCKINGBIRD_API_KEY=your_api_key_here
+MOCKINGBIRD_API_BASE_URL=https://your-custom-api-endpoint.com
 ```
 
-The CLI will load environment variables from this file automatically.
+The CLI automatically loads environment variables from `.env` files using [dotenv](https://github.com/motdotla/dotenv).
 
 ### Getting an API Key
 

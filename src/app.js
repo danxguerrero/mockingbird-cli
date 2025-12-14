@@ -1,9 +1,13 @@
-import React, { useState, useCallback } from 'react';
-import { Box, Text, useInput } from 'ink';
-import { Interview } from './interview/Interview.js';
-import { Timer } from './interview/components/timer.js';
+import React, {useState, useCallback} from 'react';
+import {Box, Text, useInput} from 'ink';
+import {Interview} from './interview/Interview.js';
+import {Timer} from './interview/components/timer.js';
 
-const username = process.env['USER'] || process.env['LOGNAME'] || process.env['USERNAME'] || '';
+const username =
+	process.env['USER'] ||
+	process.env['LOGNAME'] ||
+	process.env['USERNAME'] ||
+	'';
 
 export default function App() {
 	// This will be used to track whether an interview is active
@@ -27,11 +31,21 @@ export default function App() {
 					Hello, <Text color="green">{username}</Text>, Welcome to MockingBird!
 				</Text>
 				<Box>
-					<Timer isActive={interviewActive} onTimerComplete={handleTimerComplete} />
+					<Timer
+						isActive={interviewActive}
+						onTimerComplete={handleTimerComplete}
+					/>
 				</Box>
 			</Box>
 
-			{interviewActive ? <Interview /> : <Text>Press <Text color="green">'s'</Text> to start an interview. Press <Text color="green">'q'</Text> to quit.</Text>}
+			{interviewActive ? (
+				<Interview />
+			) : (
+				<Text>
+					Press <Text color="green">'s'</Text> to start an interview. Press{' '}
+					<Text color="green">'q'</Text> to quit.
+				</Text>
+			)}
 		</Box>
 	);
 }
