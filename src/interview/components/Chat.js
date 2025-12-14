@@ -13,11 +13,6 @@ export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMo
 
     // Auto-scroll to bottom when new messages arrive (only if not manually scrolling or actively scrolling)
     useEffect(() => {
-        // if (messages.length > maxVisibleMessages && !isScrolling && !isScrollFocused) {
-        //     setScrollOffset(messages.length - maxVisibleMessages);
-        // } else if (messages.length <= maxVisibleMessages) {
-        //     setScrollOffset(0);
-        // }
         setScrollOffset(prev => {
             const maxOffset = Math.max(0, messages.length - maxVisibleMessages);
             if (messages.length <= maxVisibleMessages) return 0;
