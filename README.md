@@ -41,7 +41,8 @@ To run both the CLI and API locally with your own Gemini API key:
 
 ### Prerequisites
 
-- Node.js 18+
+- **CLI**: Node.js ≥16
+- **API**: Node.js ≥18
 - Google Gemini API key
 
 ### 1. Install Dependencies
