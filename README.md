@@ -8,7 +8,7 @@ MockingBird is a CLI-based coding interview simulator that connects you with an 
 
 - 🤖 **AI Interviewer**: Chat with a conversational AI interviewer
 - ⌨️ **Terminal Code Editor**: Write and submit code directly in your terminal
-- ⏱️ **Timed Sessions**: 45 minute interviews with automatic completion
+- ⏱️ **Timed Sessions**: 45-minute interviews with automatic completion
 - 📊 **AI Feedback**: Comprehensive evaluation across four key areas:
   - Communication skills
   - Problem-solving approach
@@ -121,7 +121,7 @@ Set the `MOCKINGBIRD_API_URL` environment variable:
 export MOCKINGBIRD_API_URL=http://localhost:3000
 
 # Use custom deployment
-export MOCKINGBIRD_API_URL=https://mockingbird-cli.vercel.app/
+export MOCKINGBIRD_API_URL=https://mockingbird-cli.vercel.app
 ```
 
 ### API Endpoints
