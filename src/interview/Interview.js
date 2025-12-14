@@ -5,8 +5,12 @@ import {CodeInput} from './components/CodeInput.js';
 import {Chat} from './components/Chat.js';
 import {questionData} from '../data/questions.js';
 
+const API_BASE_URL = process.env.MOCKINGBIRD_API_URL || 'http://localhost:3000';
+
 export const Interview = () => {
 	const [submittedCode, setSubmittedCode] = useState('');
+	const [currentCode, setCurrentCode] = useState('');
+	const [isLoadingAI, setIsLoadingAI] = useState(false);
 	const [messages, setMessages] = useState([
 		{
 			role: 'assistant',
@@ -16,7 +20,6 @@ export const Interview = () => {
 	]);
 	const [navigationMode, setNavigationMode] = useState(false);
 	const [focusArea, setFocusArea] = useState('chat'); // 'code', 'chat', or 'scroll'
-	const [aiResponseCount, setAiResponseCount] = useState(0);
 	const [currentQuestion, setCurrentQuestion] = useState(null);
 
 	// Load and set a random question when component mounts
@@ -27,23 +30,7 @@ export const Interview = () => {
 		}
 	}, []);
 
-	// Handle delayed AI responses
-	useEffect(() => {
-		if (aiResponseCount > 0) {
-			const timer = setTimeout(() => {
-				setMessages(prev => [
-					...prev,
-					{
-						role: 'assistant',
-						content:
-							'This is a placeholder response. AI integration coming soon!',
-					},
-				]);
-				setAiResponseCount(prev => prev - 1);
-			}, 500);
-			return () => clearTimeout(timer);
-		}
-	}, [aiResponseCount]);
+
 
 	// Handle Ctrl+W to toggle navigation mode and arrow keys to switch focus
 	useInput(
@@ -88,18 +75,67 @@ export const Interview = () => {
 		setSubmittedCode(code);
 	};
 
-	const handleChatMessage = message => {
+	const handleChatMessage = async message => {
 		// Add user message to chat
-		setMessages(prev => [
-			...prev,
+		const updatedMessages = [
+			...messages,
 			{
 				role: 'user',
 				content: message,
 			},
-		]);
+		];
+		setMessages(updatedMessages);
 
-		// Increment response counter to trigger AI response after a delay
-		setAiResponseCount(prev => prev + 1);
+		// Set loading state
+		setIsLoadingAI(true);
+
+		try {
+			// Prepare context
+			const context = {
+				submittedCode: currentCode.trim() || submittedCode,
+				question: currentQuestion ? currentQuestion.description : '',
+				interviewTime: 'ongoing'
+			};
+
+			const response = await fetch(`${API_BASE_URL}/api/chat`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					messages: updatedMessages,
+					context: context
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error(`API request failed: ${response.status}`);
+			}
+
+			const data = await response.json();
+
+			// Add AI response to chat
+			setMessages(prev => [
+				...prev,
+				{
+					role: 'assistant',
+					content: data.response,
+				},
+			]);
+		} catch (error) {
+			console.error('Chat API error:', error);
+
+			// Add error message to chat
+			setMessages(prev => [
+				...prev,
+				{
+					role: 'assistant',
+					content: `Sorry, I'm having trouble connecting right now. Please try again later. (Error: ${error.message})`,
+				},
+			]);
+		} finally {
+			setIsLoadingAI(false);
+		}
 	};
 
 	return (
@@ -137,6 +173,8 @@ export const Interview = () => {
 				<CodeInput
 					onSubmit={handleCodeSubmit}
 					focus={focusArea === 'code' && !navigationMode}
+					currentCode={currentCode}
+					onCodeChange={setCurrentCode}
 				/>
 			</Box>
 		</Box>
@@ -146,7 +184,6 @@ export const Interview = () => {
 			borderColor={
 				focusArea === 'chat' && !navigationMode ? 'yellow' : 'green'
 			}
-			marginTop={1}
 			height="50%"
 		>
 			<Chat
@@ -154,6 +191,7 @@ export const Interview = () => {
 				messages={messages}
 				focusArea={focusArea}
 				navigationMode={navigationMode}
+				isLoadingAI={isLoadingAI}
 			/>
 		</Box>
 	</Box>
