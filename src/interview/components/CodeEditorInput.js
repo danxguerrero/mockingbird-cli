@@ -46,7 +46,7 @@ export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
     // Ensure cursor is visible when it changes
     useEffect(() => {
         ensureCursorVisible();
-    }, [cursorY, cursorX]);
+    }, [cursorY]);
 
     // Clean up timeout on unmount
     useEffect(() => {
