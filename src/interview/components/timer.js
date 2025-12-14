@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Text } from 'ink';
 
 export const Timer = ({ isActive, onTimerComplete }) => {
-    const [timeRemaining, setTimeRemaining] = useState(2700); // 45 minutes in seconds
+    const [timeRemaining, setTimeRemaining] = useState(2700); // 10 seconds for testing
 
     useEffect(() => {
         if (isActive) {
-            // Reset timer to 45 minutes when interview starts
+            // Reset timer to 10 seconds when interview starts
             setTimeRemaining(2700);
 
             // Set up interval for countdown
@@ -15,8 +15,11 @@ export const Timer = ({ isActive, onTimerComplete }) => {
                     if (prevTime <= 1) {
                         // Timer completed
                         clearInterval(timerInterval);
+                        // Use setTimeout to defer callback execution until after render cycle
                         if (onTimerComplete) {
-                            onTimerComplete();
+                            setTimeout(() => {
+                                onTimerComplete();
+                            }, 0);
                         }
                         return 0;
                     }
