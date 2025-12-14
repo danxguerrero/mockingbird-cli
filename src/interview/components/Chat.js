@@ -18,7 +18,7 @@ export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMo
         } else if (messages.length <= maxVisibleMessages) {
             setScrollOffset(0);
         }
-    }, [messages.length, isScrolling, isScrollFocused, navigationMode]);
+    }, [messages.length, isScrolling, isScrollFocused]);
 
     // Handle keyboard scrolling when scroll area is focused
     useInput((input, key) => {
