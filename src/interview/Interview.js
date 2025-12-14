@@ -1,7 +1,9 @@
+
 import {Box, Text, useInput} from 'ink';
 import {useState, useEffect} from 'react';
 import {CodeInput} from './components/CodeInput.js';
 import {Chat} from './components/Chat.js';
+import {questionData} from '../data/questions.js';
 
 export const Interview = () => {
 	const [submittedCode, setSubmittedCode] = useState('');
@@ -15,6 +17,15 @@ export const Interview = () => {
 	const [navigationMode, setNavigationMode] = useState(false);
 	const [focusArea, setFocusArea] = useState('chat'); // 'code', 'chat', or 'scroll'
 	const [aiResponseCount, setAiResponseCount] = useState(0);
+	const [currentQuestion, setCurrentQuestion] = useState(null);
+
+	// Load and set a random question when component mounts
+	useEffect(() => {
+		if (questionData.questions && questionData.questions.length > 0) {
+			const randomIndex = Math.floor(Math.random() * questionData.questions.length);
+			setCurrentQuestion(questionData.questions[randomIndex]);
+		}
+	}, []);
 
 	// Handle delayed AI responses
 	useEffect(() => {
@@ -92,48 +103,59 @@ export const Interview = () => {
 	};
 
 	return (
-		<Box flexDirection="column" height="100%">
-			<Box flexDirection="row" flexGrow={1}>
-				<Box
-					width="25%"
-					borderStyle="round"
-					borderColor="green"
-					flexDirection="column"
-				>
-					<Text>Question here</Text>
-					{navigationMode && (
-						<Text color="yellow">Nav: {focusArea} | Press Ctrl+W to exit</Text>
-					)}
-				</Box>
-				<Box
-					width="75%"
-					borderStyle="round"
-					borderColor={
-						focusArea === 'code' && !navigationMode ? 'yellow' : 'green'
-					}
-				>
-					<CodeInput
-						onSubmit={handleCodeSubmit}
-						focus={focusArea === 'code' && !navigationMode}
-					/>
-				</Box>
+		<Box flexDirection="column" height={50}>
+			<Box flexDirection="row" height="50%">
+			<Box
+				width="25%"
+				borderStyle="round"
+				borderColor="green"
+				flexDirection="column"
+			>
+				{currentQuestion ? (
+					<>
+						<Text wrap="wrap">
+							{currentQuestion.description}
+						</Text>
+						<Text color="cyan" marginTop={1}>
+							Difficulty: {currentQuestion.difficulty}
+						</Text>
+					</>
+				) : (
+					<Text>Loading question...</Text>
+				)}
+				{navigationMode && (
+					<Text color="yellow">Nav: {focusArea} | Press Ctrl+W to exit</Text>
+				)}
 			</Box>
 			<Box
-				width="100%"
+				width="75%"
 				borderStyle="round"
 				borderColor={
-					focusArea === 'chat' && !navigationMode ? 'yellow' : 'green'
+					focusArea === 'code' && !navigationMode ? 'yellow' : 'green'
 				}
-				marginTop={1}
-				height={30}
 			>
-				<Chat
-					onSubmit={handleChatMessage}
-					messages={messages}
-					focusArea={focusArea}
-					navigationMode={navigationMode}
+				<CodeInput
+					onSubmit={handleCodeSubmit}
+					focus={focusArea === 'code' && !navigationMode}
 				/>
 			</Box>
 		</Box>
+		<Box
+			width="100%"
+			borderStyle="round"
+			borderColor={
+				focusArea === 'chat' && !navigationMode ? 'yellow' : 'green'
+			}
+			marginTop={1}
+			height="50%"
+		>
+			<Chat
+				onSubmit={handleChatMessage}
+				messages={messages}
+				focusArea={focusArea}
+				navigationMode={navigationMode}
+			/>
+		</Box>
+	</Box>
 	);
 };
