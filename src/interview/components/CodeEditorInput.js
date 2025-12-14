@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Box, Text, useInput } from 'ink';
 
 export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
@@ -18,7 +18,7 @@ export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
     };
 
     // Auto-scroll to keep cursor visible
-    const ensureCursorVisible = () => {
+    const ensureCursorVisible = useCallback(() => {
         let newOffset = scrollOffset;
 
         // Cursor is above visible area
@@ -41,12 +41,12 @@ export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
                 setIsScrolling(false);
             }, 1000);
         }
-    };
+    }, [scrollOffset, maxHeight, lines.length]);
 
     // Ensure cursor is visible when it changes
     useEffect(() => {
         ensureCursorVisible();
-    }, [cursorY]);
+    }, [cursorY, ensureCursorVisible]);
 
     // Clean up timeout on unmount
     useEffect(() => {
