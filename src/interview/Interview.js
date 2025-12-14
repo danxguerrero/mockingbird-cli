@@ -1,18 +1,39 @@
 import { Box, Text, useInput } from 'ink';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CodeInput } from './components/CodeInput.js';
 import { Chat } from './components/Chat.js';
 
 export const Interview = () => {
     const [submittedCode, setSubmittedCode] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState([
+        {
+            role: 'assistant',
+            content: 'Hello! I am MockingBird, your AI interviewer. If you need any additional information about the coding question, please let me know. Otherwise you may begin coding and talk me through your thought process.'
+         },
+    ]);
     const [navigationMode, setNavigationMode] = useState(false);
-    const [focusArea, setFocusArea] = useState('code'); // 'code', 'chat', or 'scroll'
+    const [focusArea, setFocusArea] = useState('chat'); // 'code', 'chat', or 'scroll'
+    const [aiResponsePending, setAiResponsePending] = useState(false);
+
+    // Handle delayed AI responses
+    useEffect(() => {
+        if (aiResponsePending) {
+            const timer = setTimeout(() => {
+                setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: 'This is a placeholder response. AI integration coming soon!'
+                }]);
+                setAiResponsePending(false);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [aiResponsePending]);
 
     // Handle Ctrl+W to toggle navigation mode and arrow keys to switch focus
     useInput((input, key) => {
         if (key.ctrl && (input === 'w' || input === 'W')) {
-            setNavigationMode(prev => !prev);
+            const newNavMode = !navigationMode;
+            setNavigationMode(newNavMode);
             return;
         }
 
@@ -54,15 +75,9 @@ export const Interview = () => {
             role: 'user',
             content: message
         }]);
-        
-        // TODO: Send message to AI and get response
-        // For now, just echo back
-        setTimeout(() => {
-            setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: 'This is a placeholder response. AI integration coming soon!'
-            }]);
-        }, 500);
+
+        // Trigger AI response after a delay
+        setAiResponsePending(true);
     };
 
     return (
@@ -92,7 +107,7 @@ export const Interview = () => {
                 borderStyle="round"
                 borderColor={focusArea === 'chat' && !navigationMode ? 'yellow' : 'green'}
                 marginTop={1}
-                height={15}
+                height={30}
             >
                 <Chat 
                     onSubmit={handleChatMessage} 
