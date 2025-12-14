@@ -21,8 +21,15 @@ if (GEMINI_API_KEY) {
     }
 }
 
-// Format conversation messages for Gemini
 function formatMessagesForGemini(messages, context = {}) {
+    // Validate and sanitize messages array
+    const validMessages = (Array.isArray(messages) ? messages : [])
+        .filter(msg => msg && typeof msg === 'object' && msg.role != null && msg.content != null)
+        .map(msg => ({
+            role: String(msg.role),
+            content: String(msg.content)
+        }));
+
     const systemPrompt = `You are MockingBird, an AI technical interviewer conducting a coding interview.
 
 Context:
@@ -37,7 +44,7 @@ Guidelines:
 - Be conversational and engaging
 
 Recent conversation:
-${messages.map(msg => `${msg.role === 'user' ? 'Candidate' : 'Interviewer'}: ${msg.content}`).join('\n')}
+${validMessages.map(msg => `${msg.role === 'user' ? 'Candidate' : 'Interviewer'}: ${msg.content}`).join('\n')}
 
 Respond as the interviewer. Keep your response focused and professional.`;
 
