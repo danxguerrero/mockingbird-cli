@@ -119,7 +119,7 @@ app.post('/api/feedback', async (req, res) => {
 
         const feedbackPrompt = `You are reviewing a mock technical interview that the user just had. Based on the provided chat History, write feedback on the users performance.
 
-        The feedback should focus on the following areas:
+        The feedback should focus on the following areas, with each evaluation limited to no more than 3 sentences:
         1. Communication - Does the candidate make clarifications, communicate their approach and explain while coding?
         2. Problem Solving - Does the candidate show they understand the problem and are able to come up with a sound approach, conduct trade-offs analysis and optimize their approach?
         3. Technical Competency - How fast and accurate is the implementation? Were there syntax errors?
