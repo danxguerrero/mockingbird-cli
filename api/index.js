@@ -1,9 +1,11 @@
 import express from 'express';
+import cors from 'cors';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const app = express();
 
 // Middleware
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // Initialize Gemini AI
@@ -46,7 +48,7 @@ Guidelines:
 Recent conversation:
 ${validMessages.map(msg => `${msg.role === 'user' ? 'Candidate' : 'Interviewer'}: ${msg.content}`).join('\n')}
 
-Respond as the interviewer. Keep your response focused and professional.`;
+Respond as the interviewer. Keep your response focused and professional and as concise as possible. It should be about 3 lines long and not contain empty lines.`;
 
     return systemPrompt;
 }

@@ -3,10 +3,10 @@ import { Box, Text, useInput } from 'ink';
 import { MultiLineInput } from './MultiLineInput.js';
 import { ChatMessage } from './ChatMessage.js';
 
-export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMode = false }) => {
+export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMode = false, isLoadingAI = false }) => {
     const [scrollOffset, setScrollOffset] = useState(0);
     const [isScrolling, setIsScrolling] = useState(false);
-    const maxVisibleMessages = 4; // Number of messages visible at once (adjusted for actual terminal space)
+    const maxVisibleMessages = 2; // Number of messages visible at once (adjusted for actual terminal space)
     const scrollTimeoutRef = useRef(null);
     const isChatFocused = focusArea === 'chat' && !navigationMode;
     const isScrollFocused = focusArea === 'scroll';
@@ -113,7 +113,7 @@ export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMo
                 paddingY={1}
                 width="100%"
             >
-                {visibleMessages.length === 0 ? (
+                {visibleMessages.length === 0 && !isLoadingAI ? (
                     <Box flexGrow={1} justifyContent="center" alignItems="center">
                         <Text color="gray" dimColor>
                             No messages yet. Start a conversation!
@@ -128,7 +128,14 @@ export const Chat = ({ onSubmit, messages = [], focusArea = 'chat', navigationMo
                                 role={msg.role}
                             />
                         ))}
-                        {messages.length > maxVisibleMessages && (
+                        {isLoadingAI && (
+                            <Box paddingX={1} paddingY={1}>
+                                <Text color="yellow">
+                                    🤔 AI is thinking...
+                                </Text>
+                            </Box>
+                        )}
+                        {!isLoadingAI && messages.length > maxVisibleMessages && (
                             <Box paddingX={1} paddingY={0}>
                                 <Text color={isScrollFocused ? 'yellow' : 'gray'} dimColor={!isScrollFocused}>
                                     {isScrollFocused && '[SCROLL MODE] '}

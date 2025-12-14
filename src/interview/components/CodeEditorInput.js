@@ -1,13 +1,36 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Box, Text, useInput } from 'ink';
 
-export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
-    const [lines, setLines] = useState(['']);
+export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8, currentCode = '', onCodeChange = () => {} }) => {
+    // Convert currentCode prop to lines array
+    const codeToLines = (code) => code ? code.split('\n') : [''];
+
+    // Convert lines array back to code string
+    const linesToCode = (lines) => lines.join('\n');
+
+    // Use currentCode as the source of truth, convert to lines for internal operations
+    const [lines, setLines] = useState(() => codeToLines(currentCode));
     const [cursorY, setCursorY] = useState(0);
     const [cursorX, setCursorX] = useState(0);
     const [scrollOffset, setScrollOffset] = useState(0);
     const [isScrolling, setIsScrolling] = useState(false);
     const scrollTimeoutRef = useRef(null);
+
+    // Sync external currentCode changes to internal lines state
+    useEffect(() => {
+        const externalLines = codeToLines(currentCode);
+        if (JSON.stringify(externalLines) !== JSON.stringify(lines)) {
+            setLines(externalLines);
+        }
+    }, [currentCode]);
+
+    // Notify parent of code changes, but avoid infinite loops
+    useEffect(() => {
+        const newCode = linesToCode(lines);
+        if (newCode !== currentCode) {
+            onCodeChange(newCode);
+        }
+    }, [lines, currentCode, onCodeChange]);
 
     // Clear scroll timeout
     const clearScrollTimeout = () => {
@@ -160,8 +183,8 @@ export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8 }) => {
             return;
         }
 
-        // Backspace
-        if (key.backspace) {
+        // Backspace or delete(backspace on Mac)
+        if (key.backspace || key.delete) {
             const currentLine = lines[cursorY];
             if (cursorX > 0) {
                 // Delete character before cursor
