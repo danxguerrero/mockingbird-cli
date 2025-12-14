@@ -238,17 +238,17 @@ export const CodeEditorInput = ({ onSubmit, focus = false, maxHeight = 8, curren
                     const actualIndex = scrollOffset + visibleIndex;
                     return (
                         <Box key={actualIndex} flexDirection="row">
-                            <Text>
-                                {actualIndex === cursorY && focus ? (
-                                    <>
-                                        {line.slice(0, cursorX)}
-                                        <Text inverse> </Text>
-                                        {line.slice(cursorX)}
-                                    </>
-                                ) : (
-                                    line || ' '
-                                )}
-                            </Text>
+                        <Text>
+                            {actualIndex === cursorY && focus ? (
+                                <>
+                                    {line.slice(0, cursorX)}
+                                    <Text inverse>{cursorX < line.length ? line[cursorX] : ' '}</Text>
+                                    {line.slice(cursorX + (cursorX < line.length ? 1 : 0))}
+                                </>
+                            ) : (
+                                line || ' '
+                            )}
+                        </Text>
                         </Box>
                     );
                 })}
